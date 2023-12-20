@@ -1,13 +1,13 @@
 package src;
 import java.lang.IllegalArgumentException;
-import java.util.Arrays;
-
-import edu.princeton.cs.algs4.StdRandom;
-import edu.princeton.cs.algs4.StdStats;
+import java.util.ArrayList;
+import java.util.List;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
+import java.util.Random;
 	
 	public class Percolation {
 		private int[][] grid;
+		
 		private WeightedQuickUnionUF network;
 		private int gridSize;
 		private int gridSizeSquared;
@@ -23,11 +23,13 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 			if(n<=0) throw new IllegalArgumentException("n <= 0");
 			
 			this.grid = new int[n][n];
+
 			// + 2 account for virtual top and bottom.
 			this.network = new WeightedQuickUnionUF(n * n + 2);
 			this.virtualTop = n*n;
 			this.virtualBottom = n*n + 1;
 			this.gridSize = n;
+			this.gridSizeSquared = n*n;
 			
 			// link virt top to top row, link virt bottom to bottom row.
 			for(int i = 0; i<n;i++) {
@@ -54,10 +56,9 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 				for(int[] testCase : testCases) {
 					// if adjacent piece is on, union them.
 					if(testCase[0] >= 0 && testCase[0] < gridSize && testCase[1] >= 0 && testCase[1] < gridSize) {
-						System.out.println("row: " +row + "col: " + col);
+//						System.out.println("row: " +row + "col: " + col);
 						if(isOpen(testCase[0], testCase[1])) {
 							this.network.union(xyTo1d(row, col), xyTo1d(testCase[0], testCase[1]));
-							this.numOpenSites--;
 						}
 					}
 
@@ -92,27 +93,49 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 		public boolean percolates() {
 			// get last row in array, then for each item
 			// check isFull, if one is true, stop return true (sys percolates)
-			int lastRowIndex = grid.length-1;
-			for(int i = 0; i< grid.length; i++) {
-				if(isFull(lastRowIndex, i)) return true;
-			}
-			return false;
+//			int lastRowIndex = grid.length-1;
+//			for(int i = 0; i< grid.length; i++) {
+//				if(isFull(lastRowIndex, i)) return true;
+//			}
+			return network.find(virtualTop) == network.find(virtualBottom);
 		}
 		
 		
 		
 		// test client (optional)
 		public static void main(String[] args) {
+			Random newRandom = new Random();
 			System.out.println("This is the test.");
-			Percolation test1 = new Percolation(3);
-			System.out.println(test1.isOpen(0,0) + "should be false, 0,0");
-			System.out.println(test1.isOpen(1,0) + "should be false, 1,0");
-			System.out.println(test1.isOpen(2,0) + "should be false, 2,0");
-			test1.open(0,0);
-			test1.open(1,0);
-			test1.open(2,0);
-			test1.open(2,0);
-			System.out.println(test1.percolates() + "should be true for perco");
+			Percolation test1 = new Percolation(20);
+			
+			
+			List<int[]> attemptedOpens = new ArrayList<>();
+			
+			// establish a list of arr spots, to be used for random gen spot to open.
+			for(int i = 0; i< test1.gridSize; i++) {
+				for(int j = 0; j< test1.gridSize; j++) {
+					int[] gridSpot = {i, j};
+					attemptedOpens.add(gridSpot);
+				}
+				
+			}
+			
+			while(!test1.percolates()) {
+				
+	
+				int randomNum = newRandom.nextInt(attemptedOpens.size());
+				System.out.println(attemptedOpens.size() + "****attOpens.size");
+				System.out.println(randomNum + "*****RNGNUM");
+				int[] randomSpot = attemptedOpens.get(randomNum);
+				attemptedOpens.remove(randomNum);
+				System.out.println(attemptedOpens.size() + "size after removal, should be 1 less than prev");
+				System.out.println("-----------------------------------");
+				
+				if(!test1.isOpen(randomSpot[0], randomSpot[1])) {
+					test1.open(randomSpot[0], randomSpot[1]);
+				}
+			}
+			System.out.println("Sys perco!!! perco count: "+ test1.numberOfOpenSites());
 		}
 	}
 	
