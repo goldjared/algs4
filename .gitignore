@@ -2,4 +2,13 @@ algs4.jar
 out
 .idea
 *.iml
+edu
+META-INF
+COPYING
+princeton-algorithms-1.iml
+TestAlgs4.class
+TestAlgs4.java
+*.class
+*.txt
+*/out/*
 
