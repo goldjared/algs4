@@ -57,7 +57,16 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 		Iterator<Item> removeIter = iterator();
 		Item toBeRemoved = removeIter.next();
 		Node lastVisited = ((RandomIterator) removeIter).getLastVisited();
-		lastVisited.prev.next = lastVisited.next;
+//		System.out.println("lastVis: " + lastVisited.item);
+		if(head.item != lastVisited.item) {
+			lastVisited.prev.next = lastVisited.next;
+		} else if(head == lastVisited){
+			// it's head, remove head. but if size greater 1, set new head.
+			// also, if tail is last item, oldHeadNext = tail, so head become tail.
+			Node oldHeadNext = null;
+			if(size>1) oldHeadNext = head.next;
+			head = oldHeadNext;
+		}
 		size--;
 		
 		return toBeRemoved;
@@ -86,14 +95,15 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 		
 		public Item next() {
 			if (!hasNext()) throw new NoSuchElementException();
-			int randomNum = rng.nextInt(size); // 1-6
-			System.out.println("*********randomNum: " + randomNum);
+			int randomNum = rng.nextInt(size);
+//			System.out.println("*********randomNum: " + randomNum);
 			for(int i = 0; i<randomNum; i++) {
 				current = current.next;
 			}
-			if(randomNum == 0) {
-				current = current.next;
-			}
+//			if(randomNum == 0) {
+//				current = head;
+//
+//			}
 			Item item = current.item; //this is equal null and causing error
 			lastVisited = current;
 			current = head;
@@ -105,7 +115,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 	
 	// unit testing (required)
 	public static void main(String[] args) {
-		RandomizedQueue test2 = new RandomizedQueue();
+		RandomizedQueue<String> test2 = new RandomizedQueue<>();
 //		test2.enqueue("0");
 		System.out.println(test2.size());
 		test2.enqueue("a");
@@ -113,12 +123,12 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 		test2.enqueue("c");
 		
 		System.out.println(test2.size());
-
-		for(int i = 0; i< test2.size(); i++) {
+		int originalSize = test2.size();
+		for(int i = 0; i< originalSize; i++) {
 			System.out.println("Loop iteration i = " + i +" removed item: " + test2.dequeue());
 			System.out.println("size after removal: " + test2.size());
 		}
-		System.out.println(test2.head.next);
+//		System.out.println(test2.head.item);
 //		System.out.println("Loop iteration 1,  removed item: " + test2.dequeue());
 //		System.out.println("size after removal: " + test2.size());
 //		System.out.println("Loop iteration 2,  removed item: " + test2.dequeue());
