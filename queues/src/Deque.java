@@ -49,10 +49,12 @@ public class Deque<Item> implements Iterable<Item> {
 	// add the item to the back
 	public void addLast(Item item) {
 		if(item == null) throw new IllegalArgumentException();
+		Node oldTail = tail;
 		Node newTail = new Node();
 		newTail.item = item;
 		newTail.next = null;
 		tail = newTail;
+		oldTail.next = tail;
 		size++;
 	}
 	
@@ -103,7 +105,19 @@ public class Deque<Item> implements Iterable<Item> {
 	
 	// unit testing (required)
 	public static void main(String[] args) {
-
+		Deque test = new Deque();
+		System.out.println(test.isEmpty() + "is empty F");
+		System.out.println(test.getSize());
+		test.addFirst("a");
+		System.out.println("is empty? should b T" + test.isEmpty());
+		System.out.println(test.getSize());
+		test.addFirst("b");
+		test.addFirst("c");
+		test.addFirst("d");
+		test.addFirst("e");
+		System.out.println(test.getSize());
+		System.out.println(test.removeLast());
+		System.out.println(test.getSize());
 		
 	}
 }
