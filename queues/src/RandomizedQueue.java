@@ -30,52 +30,61 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 	}
 	
 	// return the number of items on the randomized queue
-	public int size() { return size; }
+	public int size() {
+		return size;
+	}
 	
 	// add the item
 	public void enqueue(Item item) {
-		if(item == null) throw new IllegalArgumentException();
-		if(isEmpty()) {
+		if (item == null) throw new IllegalArgumentException();
+		if (isEmpty()) {
 			head = new Node();
 			head.item = item;
 			head.next = null;
-			tail = head;
+//			tail = head;
 		} else {
-			Node oldTail = tail;
-			tail = new Node();
+			if (tail == null) {
+				head.next = new Node();
+				tail = head.next;
+				tail.prev = head;
+			} else {
+				Node oldTail = tail;
+				tail = new Node();
+				tail.prev = oldTail;
+				oldTail.next = tail;
+			}
 			tail.item = item;
 			tail.next = null;
-			tail.prev = oldTail;
-			oldTail.next = tail;
 		}
 		size++;
 	}
 	
 	// remove and return a random item
 	public Item dequeue() {
-		if(isEmpty()) throw new NoSuchElementException();
+		if (isEmpty()) throw new NoSuchElementException();
 		Iterator<Item> removeIter = iterator();
 		Item toBeRemoved = removeIter.next();
 		Node lastVisited = ((RandomIterator) removeIter).getLastVisited();
-//		System.out.println("lastVis: " + lastVisited.item);
-		if(head.item != lastVisited.item) {
+		
+		if (head != lastVisited) {
 			lastVisited.prev.next = lastVisited.next;
-		} else if(head == lastVisited){
-			// it's head, remove head. but if size greater 1, set new head.
-			// also, if tail is last item, oldHeadNext = tail, so head become tail.
+			if (lastVisited.next != null) lastVisited.next.prev = lastVisited.prev;
+			
+		} else {
+			
 			Node oldHeadNext = null;
-			if(size>1) oldHeadNext = head.next;
+			if (size > 1) oldHeadNext = head.next;
 			head = oldHeadNext;
 		}
 		size--;
 		
 		return toBeRemoved;
-	
+		
 	}
 	
 	// return a random item (but do not remove it)
 	public Item sample() {
-		if(isEmpty()) throw new NoSuchElementException();
+		if (isEmpty()) throw new NoSuchElementException();
 		Iterator<Item> sampleIter = iterator();
 		return sampleIter.next();
 	}
@@ -89,6 +98,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 		Random rng = new Random();
 		private Node current = head;
 		private Node lastVisited = null;
+		
 		public boolean hasNext() {
 			return current != null;
 		}
@@ -96,21 +106,18 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 		public Item next() {
 			if (!hasNext()) throw new NoSuchElementException();
 			int randomNum = rng.nextInt(size);
-//			System.out.println("*********randomNum: " + randomNum);
-			for(int i = 0; i<randomNum; i++) {
+			for (int i = 0; i < randomNum; i++) {
 				current = current.next;
 			}
-//			if(randomNum == 0) {
-//				current = head;
-//
-//			}
-			Item item = current.item; //this is equal null and causing error
+			
+			Item item = current.item;
 			lastVisited = current;
-			current = head;
 			return item;
 		}
 		
-		public Node getLastVisited() { return lastVisited; }
+		public Node getLastVisited() {
+			return lastVisited;
+		}
 	}
 	
 	// unit testing (required)
@@ -124,8 +131,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 		
 		System.out.println(test2.size());
 		int originalSize = test2.size();
-		for(int i = 0; i< originalSize; i++) {
-			System.out.println("Loop iteration i = " + i +" removed item: " + test2.dequeue());
+		for (int i = 0; i < originalSize; i++) {
+			System.out.println("Loop iteration i = " + i + " removed item: " + test2.dequeue());
 			System.out.println("size after removal: " + test2.size());
 		}
 //		System.out.println(test2.head.item);
